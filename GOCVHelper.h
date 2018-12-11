@@ -100,6 +100,7 @@
 		//寻找并绘制出彩色联通区域
 		vector<VP> connection2(Mat src,Mat& draw);
 		vector<VP> connection2(Mat src);
+		int Draw_contour_inner(cv::Mat src, vector<Point> &contours);//寻找最大内轮廓
 		//根据轮廓的面积大小进行选择
 		/*使用方法
 		Mat src = imread2gray("E:\\sandbox\\connection.png");

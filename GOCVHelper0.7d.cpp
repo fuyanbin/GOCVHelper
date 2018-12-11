@@ -1183,4 +1183,53 @@ Mat LocalNormalization(Mat float_gray,float sigma1,float sigma2){
 	}
 #pragma endregion excel操作
 
+#pragma region Draw_contours 画最大内轮廓
+int Draw_contour_inner(cv::Mat src, vector<Point> &contours)
+{
+	Mat image_contour_all = src.clone();
+	Mat image_contour_outside = src.clone();
+
+	vector<vector<Point> > contours_out;
+	vector<Vec4i> hierarchy_out;
+	findContours(image_contour_outside, contours_out, hierarchy_out, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+
+	vector<vector<Point> > contours_all;
+	vector<Vec4i> hierarchy_all;
+	findContours(image_contour_all, contours_all, hierarchy_all, RETR_TREE, CHAIN_APPROX_NONE);
+
+	if (contours_all.size() == contours_out.size()) return -1;//没有内轮廓，则提前返回
+
+	for (int i = 0; i < contours_out.size(); i++)
+	{
+		int conloursize = contours_out[i].size();
+		for (int j = 0; j < contours_all.size(); j++)
+		{
+			int tem_size = contours_all[j].size();
+			if (conloursize == tem_size)
+			{
+				swap(contours_all[j], contours_all[contours_all.size() - 1]);
+				contours_all.pop_back();
+				break;
+			}
+		}
+	}
+	
+	//contours_all中只剩下内轮廓
+	//查找最大轮廓
+	double maxarea = 0;
+	int maxAreaIdx = 0;
+	for (int index = contours_all.size() - 1; index >= 0; index--)
+	{
+		double tmparea = fabs(contourArea(contours_all[index]));
+		if (tmparea > maxarea)
+		{
+			maxarea = tmparea;
+			maxAreaIdx = index;//记录最大轮廓的索引号
+		}
+	}
+
+	contours = contours_all[maxAreaIdx];
+	return 0;
+}
+#pragma endregion Draw_contours
 }
